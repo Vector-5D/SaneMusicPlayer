@@ -1,5 +1,5 @@
 # Sane Music Player
-A simple music player written in C with Raylib, Taglib and MiniAudio.
+A simple music player written in C with Raylib, Taglib, NativeFileDialogs and MiniAudio.
 
 ## Usage
 Clone the repository and build the project with 'make clean all'. Make sure Raylib and Taglib are installed. If it still doesn't compile, try changing the dependency paths in the Makefile.

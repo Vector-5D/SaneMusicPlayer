@@ -1,6 +1,8 @@
 #include "app.h"
+#include "file_dialog.h"
 #include "logger.h"
 #include "raylib.h"
+#include <stdlib.h>
 
 void handle_input(app_t* app);
 void update(app_t* app);
@@ -21,16 +23,6 @@ void app_init(app_t* app) {
     UnloadImage(icon);
     
     LOG_INFO("App initialized successfully.");
-
-    const char* test_tracks[3] = {
-        "test_song_1.mp3",
-        "test_song_2.mp3",
-        "test_song_3.mp3"  
-    };
-
-    playlist_append_multiple(&app->playlist, test_tracks, 3);
-
-    playlist_play_current(&app->playlist, &app->audio_device);
 }
 
 void app_free(app_t* app) {
@@ -50,11 +42,12 @@ void app_run(app_t* app) {
 }
 
 void handle_input(app_t* app) {
+    // playback controls
     if (IsKeyPressed(KEY_LEFT))
         playlist_play_previous(&app->playlist, &app->audio_device);
     if (IsKeyPressed(KEY_RIGHT))
         playlist_play_next(&app->playlist, &app->audio_device);
-
+    
     if (IsKeyPressed(KEY_SPACE)) {
         if (audio_device_is_paused(&app->audio_device)) {
             audio_device_resume(&app->audio_device);
@@ -63,6 +56,7 @@ void handle_input(app_t* app) {
         }
     }
 
+    // volume
     if (IsKeyPressed(KEY_DOWN)) {
         float volume = audio_device_get_volume(&app->audio_device);
         volume = volume - 0.05f <= 0.0f ? 0.0f : volume - 0.05f;
@@ -72,6 +66,31 @@ void handle_input(app_t* app) {
         float volume = audio_device_get_volume(&app->audio_device);
         volume = volume + 0.05f >= 1.0f ? 1.0f : volume + 0.05f;
         audio_device_set_volume(&app->audio_device, volume);
+    }
+
+    // file IO
+    if (IsKeyDown(KEY_LEFT_CONTROL) &&
+        IsKeyDown(KEY_LEFT_SHIFT) &&
+        IsKeyPressed(KEY_O)) {
+        char* folder_path = file_dialog_open_folder();
+        if (folder_path) {
+            playlist_clear(&app->playlist);
+            LOG_INFO("Scanning folder: %s", folder_path);
+            playlist_scan_dir_recursive(&app->playlist, folder_path);
+            size_t track_count = playlist_count(&app->playlist);
+            LOG_INFO("Added %zu tracks from folder.", track_count);
+            playlist_play_current(&app->playlist, &app->audio_device);
+            free(folder_path);
+        }
+    } else if (IsKeyDown(KEY_LEFT_CONTROL) &&
+               IsKeyPressed(KEY_O)) {
+        char* path = file_dialog_open_file("mp3,flac,wav,ogg,m4a");
+        if (path) {
+            playlist_clear(&app->playlist);
+            playlist_append(&app->playlist, path);
+            playlist_play_current(&app->playlist, &app->audio_device);
+            free(path);
+        }
     }
 }
 

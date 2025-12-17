@@ -39,6 +39,8 @@ bool playlist_remove(playlist_t* list, size_t index);
 // clear all tracks from the playlist
 // note: clearing playlist does NOT free it
 bool playlist_clear(playlist_t* list);
+// recursively scans the provided folder path and adds audio files to playlist
+void playlist_scan_dir_recursive(playlist_t* list, const char* dir_path);
 
 // plays the current track on the provided audio device
 bool playlist_play_current(playlist_t* list, audio_device_t* dev);

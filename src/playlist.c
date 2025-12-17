@@ -2,7 +2,30 @@
 #include "logger.h"
 #include <stdlib.h>
 #include <string.h>
+#include <strings.h>
+#include <dirent.h>
+#include <sys/stat.h>
 #include <stdint.h>
+
+// helper to check if a file is an audio file
+bool is_audio_file(const char* path) {
+    const char* ext = strrchr(path, '.');
+    if (!ext) return false;
+
+    ext++; // to skip the dot
+    return (strcasecmp(ext, "mp3") == 0 ||
+            strcasecmp(ext, "flac") == 0 ||
+            strcasecmp(ext, "wav") == 0 ||
+            strcasecmp(ext, "ogg") == 0 ||
+            strcasecmp(ext, "m4a") == 0 ||
+            strcasecmp(ext, "opus") == 0 ||
+            strcasecmp(ext, "aac") == 0);
+}
+
+// helper for comparing strings for qsort
+int compare_strings(const void* a, const void* b) {
+    return strcmp(*(const char**)a, *(const char**)b);
+}
 
 bool tracks_append(tracks_t* tracks, const char* path) {   
     if (!tracks) {
@@ -143,6 +166,67 @@ bool playlist_clear(playlist_t* list) {
     }
     list->current = 0;
     return tracks_clear(list->tracks);
+}
+
+void playlist_scan_dir_recursive(playlist_t* list, const char* dir_path) {
+    DIR* dir = opendir(dir_path);
+    if (!dir) {
+        LOG_ERROR("Failed to open directory: %s", dir_path);
+        return;
+    }
+
+    // get all entries in the folder first
+    // so we can sort alphabetically (good enough for this)
+    char** entries = NULL;
+    size_t entry_count = 0;
+    size_t entry_capacity = 0;
+
+    struct dirent* entry;
+    while ((entry = readdir(dir)) != NULL) {
+        // skip . and ..
+        if (strcmp(entry->d_name, ".") == 0 ||
+            strcmp(entry->d_name, "..") == 0) {
+            continue;        
+        }
+
+        // grow array if it no longer fits
+        if (entry_count >= entry_capacity) {
+            size_t new_capacity = entry_capacity == 0 ? 16 : entry_capacity * 2;
+            char** tmp = realloc(entries, new_capacity * sizeof(char*));
+            if (!tmp) {
+                LOG_ERROR("Memory allocation failed");
+                break;
+            }
+            entries = tmp;
+            entry_capacity = new_capacity;
+        }
+
+        entries[entry_count++] = strdup(entry->d_name);
+    }
+    closedir(dir);
+
+    // sort entries alphabetically
+    qsort(entries, entry_count, sizeof(char*), compare_strings);
+
+    for (size_t i = 0; i < entry_count; i++) {
+        // build the full path for the entry
+        char full_path[4096];
+        snprintf(full_path, sizeof(full_path), "%s/%s", dir_path, entries[i]);
+
+        struct stat path_stat;
+        if (stat(full_path, &path_stat) == 0) {
+            if (S_ISDIR(path_stat.st_mode)) {
+                // recursively scan subdirectories
+                playlist_scan_dir_recursive(list, full_path);
+            } else if (S_ISREG(path_stat.st_mode)) {
+                // only add audio files using helper function
+                if (is_audio_file(full_path)) {
+                    playlist_append(list, full_path);
+                    LOG_INFO("Added: %s", full_path);
+                }
+            }
+        }
+    }
 }
 
 bool playlist_play_current(playlist_t* list, audio_device_t* dev) {

@@ -28,7 +28,7 @@ CFLAGS := -Wall -Wshadow -Iincl -Isrc/raygui/src --std=c23 $(TAGLIB_CFLAGS) $(RA
 CXXFLAGS := -Wall -Wshadow -Iincl -Isrc/raygui/src --std=c++17 $(TAGLIB_CFLAGS) $(RAYLIB_CFLAGS)
 
 # linker flags
-LDFLAGS := $(TAGLIB_LDFLAGS) $(RAYLIB_LDFLAGS)
+LDFLAGS := $(TAGLIB_LDFLAGS) $(RAYLIB_LDFLAGS) -lnfd -lgtk-3 -lgobject-2.0 -lglib-2.0
 
 # default target
 all: $(BIN_DIR) $(OBJ_DIR) $(OUTPUT)
