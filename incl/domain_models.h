@@ -61,7 +61,7 @@ size_t track_list_index_of(track_list_t* list, const track_t* track);
 // ========================================================================
 
 // albums store pointers to tracks in the central track_list
-// they don't own the track data, just reference it
+// they don't own the track data only reference it
 typedef struct album {
     char* title; // NOT unique
     track_t** tracks; // array of pointers to tracks in central list
@@ -120,7 +120,7 @@ bool album_list_contains(album_list_t* list, const album_t* album);
 // ========================================================================
 
 // genres store pointers to albums in the central album_list
-// they don't own the album data, just reference it
+// they don't own the album data, only reference it
 typedef struct genre {
     char* name; // unique but shouldn't be treated as such functionally
     album_t** albums; // array of pointers to albums in central list
@@ -177,7 +177,7 @@ bool genre_list_contains(genre_list_t* list, const genre_t* genre);
 // ========================================================================
 
 // artists store pointers to albums in the central album_list
-// they don't own the album data, just reference it
+// they don't own the album data only reference it
 typedef struct artist {
     char* name; // NOT unique
     album_t** albums; // array of pointers to albums in central list
