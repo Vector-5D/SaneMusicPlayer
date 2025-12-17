@@ -198,10 +198,9 @@ bool playlist_play_previous(playlist_t* list, audio_device_t* dev) {
     }
 
     bool has_previous = playlist_has_previous(list);
-    bool success = audio_device_play_file(dev,
-        list->tracks->items[has_previous ? list->current - 1 : 0]
-    );
-    if (success) list->current = has_previous ? list->current - 1 : 0;
+    size_t next_index = has_previous ? list->current - 1 : list->tracks->count - 1;
+    bool success = audio_device_play_file(dev, list->tracks->items[next_index]);
+    if (success) list->current = next_index;
     return success;
 }
 

@@ -23,9 +23,9 @@ void app_init(app_t* app) {
     LOG_INFO("App initialized successfully.");
 
     const char* test_tracks[3] = {
-        "/home/rick/source/sane-music-player-4/test_song_1.mp3",
-        "/home/rick/source/sane-music-player-4/test_song_2.mp3",
-        "/home/rick/source/sane-music-player-4/test_song_3.mp3"  
+        "test_song_1.mp3",
+        "test_song_2.mp3",
+        "test_song_3.mp3"  
     };
 
     playlist_append_multiple(&app->playlist, test_tracks, 3);

@@ -58,7 +58,7 @@ bool audio_device_play_file(audio_device_t* dev, const char* path) {
     ma_result result = ma_sound_init_from_file(
         &dev->engine,
         path,
-        0,
+        MA_SOUND_FLAG_STREAM,
         nullptr,
         nullptr,
         &dev->sound
