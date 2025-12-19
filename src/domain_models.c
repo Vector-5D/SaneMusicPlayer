@@ -100,7 +100,7 @@ void track_list_free(track_list_t* list) {
     LOG_INFO("Track list freed successfully.");
 }
 
-bool track_list_append(track_list_t* list, const track_t* track) {
+bool track_list_append(track_list_t* list, track_t* track) {
     if (!list || !track) {
         LOG_ERROR("Couldn't append track to list; list or track is NULL.");
         return false;
@@ -275,7 +275,7 @@ void album_free(album_t* album) {
     LOG_INFO("Album freed successfully.");
 }
 
-bool album_add_track(album_t* album, const track_t* track) {
+bool album_add_track(album_t* album, track_t* track) {
     if (!album || !track) {
         LOG_ERROR("Couldn't add track to album; album or track is NULL.");
         return false;
@@ -399,7 +399,7 @@ void album_list_free(album_list_t* list) {
     LOG_INFO("Album list freed successfully.");
 }
 
-bool album_list_append(album_list_t* list, const album_t* album) {
+bool album_list_append(album_list_t* list, album_t* album) {
     if (!list || !album) {
         LOG_ERROR("Couldn't append album to list; list or album is NULL.");
         return false;
@@ -550,7 +550,7 @@ void artist_free(artist_t* artist) {
     LOG_INFO("Artist freed successfully.");
 }
 
-bool artist_add_album(artist_t* artist, const album_t* album) {
+bool artist_add_album(artist_t* artist, album_t* album) {
     if (!artist || !album) {
         LOG_ERROR("Couldn't add album to artist; artist or album is NULL.");
         return false;
@@ -659,7 +659,7 @@ void artist_list_free(artist_list_t* list) {
     LOG_INFO("Artist list freed successfully.");
 }
 
-bool artist_list_append(artist_list_t* list, const artist_t* artist) {
+bool artist_list_append(artist_list_t* list, artist_t* artist) {
     if (!list || !artist) {
         LOG_ERROR("Couldn't append artist to list; list or artist is NULL.");
         return false;
